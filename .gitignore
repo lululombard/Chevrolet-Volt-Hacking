@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+discovery.tsv
+metrics-all.txt
+*.crtd
+design/

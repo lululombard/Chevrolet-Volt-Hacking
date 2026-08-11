@@ -1,0 +1,73 @@
+# Sits under the Ultra Card. Every row opens more-info on tap, which is where the history graph
+# is, and each of these carries a state_class so Home Assistant keeps long term statistics for
+# it rather than throwing the values away after the recorder purge.
+type: entities
+title: Volt history
+state_color: true
+entities:
+- entity: sensor.chevrolet_volt_ev_battery_level
+  name: Battery
+  icon: mdi:battery
+- entity: sensor.chevrolet_volt_ev_target_charge_level
+  name: Charge limit
+  icon: mdi:battery-lock
+- entity: sensor.chevrolet_volt_ev_range
+  name: EV range
+  icon: mdi:map-marker-distance
+- entity: sensor.chevrolet_volt_fuel_level
+  name: Fuel
+  icon: mdi:gas-station
+- entity: sensor.chevrolet_volt_fuel_range
+  name: Fuel range
+  icon: mdi:map-marker-distance
+- entity: sensor.chevrolet_volt_total_range
+  name: Total range
+  icon: mdi:map-marker-path
+- type: divider
+- entity: sensor.chevrolet_volt_charge_power
+  name: Charge power
+  icon: mdi:flash
+- entity: sensor.chevrolet_volt_ev_charging_energy
+  name: Charge energy
+  icon: mdi:lightning-bolt
+- entity: sensor.chevrolet_volt_odometer
+  name: Odometer
+  icon: mdi:counter
+- type: divider
+- entity: sensor.chevrolet_volt_drive_cycle_distance_total
+  name: Distance since charge
+  icon: mdi:road-variant
+- entity: sensor.chevrolet_volt_drive_cycle_distance_battery
+  name: Distance on battery
+  icon: mdi:battery-charging
+- entity: sensor.chevrolet_volt_drive_cycle_distance_fuel
+  name: Distance on fuel
+  icon: mdi:gas-station
+- entity: sensor.chevrolet_volt_drive_cycle_energy_used
+  name: Energy since charge
+  icon: mdi:lightning-bolt-outline
+- entity: sensor.chevrolet_volt_drive_cycle_fuel_used
+  name: Fuel since charge
+  icon: mdi:gas-station-outline
+- entity: sensor.chevrolet_volt_drive_cycle_fuel_economy
+  name: Fuel economy
+  icon: mdi:gauge
+- entity: sensor.chevrolet_volt_ev_trip_consumption
+  name: Trip consumption
+  icon: mdi:speedometer
+- type: divider
+- entity: sensor.chevrolet_volt_ev_battery_temperature
+  name: Battery temperature
+  icon: mdi:thermometer
+- entity: sensor.chevrolet_volt_ambient_air_temperature
+  name: Outside temperature
+  icon: mdi:thermometer
+- entity: sensor.chevrolet_volt_12v_battery
+  name: 12 V battery
+  icon: mdi:car-battery
+- entity: sensor.chevrolet_volt_battery_health
+  name: Battery health
+  icon: mdi:heart-pulse
+- entity: sensor.chevrolet_volt_oil_life
+  name: Oil life
+  icon: mdi:oil

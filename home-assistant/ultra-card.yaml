@@ -1,0 +1,722 @@
+type: custom:ultra-card
+_config_version: 3
+card_background: var(--ha-card-background, var(--card-background-color))
+card_border_radius: 12
+card_border_color: var(--divider-color)
+card_border_width: 1
+card_padding: 16
+haptic_feedback: true
+layout:
+  rows:
+  - id: r-photo
+    column_layout: 1-col
+    columns:
+    - id: c-photo
+      modules:
+      - id: m-photo
+        type: image
+        image_type: url
+        image_url: /local/volt/volt.png
+        width: 100
+        height: 170px
+        object_fit: contain
+        aspect_ratio: auto
+        border_radius: 8
+  - id: r-bars
+    column_layout: 1-col
+    gap: 14
+    columns:
+    - id: c-bars
+      modules:
+      - id: m-bar-soc-raw
+        type: bar
+        percentage_type: entity
+        entity: sensor.chevrolet_volt_battery_soc_raw
+        percentage_min: 0
+        percentage_max: 100
+        limit_entity: sensor.chevrolet_volt_ev_target_charge_level
+        limit_color: '#f2f2f2'
+        height: 14
+        border_radius: 7
+        bar_style: flat
+        bar_color: '#ff9800'
+        bar_background_color: rgba(127,127,127,0.18)
+        show_percentage: false
+        left_enabled: true
+        left_title: SoC (raw pack)
+        left_entity: sensor.chevrolet_volt_battery_soc_raw
+        left_title_size: 13
+        right_enabled: true
+        right_title: Charge limit
+        right_entity: sensor.chevrolet_volt_ev_target_charge_level
+        right_title_size: 13
+        tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_battery_soc_raw
+        left_tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_battery_soc_raw
+        right_tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_ev_target_charge_level
+      - id: m-bar-soc-disp
+        type: bar
+        percentage_type: entity
+        entity: sensor.chevrolet_volt_battery_soc_displayed
+        percentage_min: 0
+        percentage_max: 100
+        height: 14
+        border_radius: 7
+        bar_style: flat
+        bar_color: '#4caf50'
+        bar_background_color: rgba(127,127,127,0.18)
+        show_percentage: false
+        left_enabled: true
+        left_title: SoC (dashboard)
+        left_entity: sensor.chevrolet_volt_battery_soc_displayed
+        left_title_size: 13
+        right_enabled: true
+        right_title: EV range
+        right_entity: sensor.chevrolet_volt_ev_range
+        right_title_size: 13
+        tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_battery_soc_displayed
+        left_tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_battery_soc_displayed
+        right_tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_ev_range
+      - id: m-bar-fuel
+        type: bar
+        percentage_type: entity
+        entity: sensor.chevrolet_volt_fuel_level
+        percentage_min: 0
+        percentage_max: 100
+        height: 14
+        border_radius: 7
+        bar_style: flat
+        bar_color: '#2196f3'
+        bar_background_color: rgba(127,127,127,0.18)
+        show_percentage: false
+        left_enabled: true
+        left_title: Fuel
+        left_entity: sensor.chevrolet_volt_fuel_level
+        left_title_size: 13
+        right_enabled: true
+        right_title: Fuel range
+        right_entity: sensor.chevrolet_volt_fuel_range
+        right_title_size: 13
+        tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_fuel_level
+        left_tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_fuel_level
+        right_tap_action:
+          action: more-info
+          entity: sensor.chevrolet_volt_fuel_range
+  - id: r-controls
+    column_layout: 1-4-1-4-1-4-1-4
+    columns:
+    - id: c-doors
+      modules:
+      - id: m-lock
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-unlocked
+          type: entity_state
+          entity: lock.chevrolet_volt_doors
+          operator: '='
+          value: unlocked
+          enabled: true
+        - id: cd-idle-m-lock-0
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '!='
+          value: locking
+          enabled: true
+        icons:
+        - id: ic-lock
+          icon_mode: entity
+          entity: lock.chevrolet_volt_doors
+          active_state: locked
+          name: Lock
+          icon_inactive: mdi:lock-open-variant
+          icon_active: mdi:lock
+          inactive_icon_color: '#ff9800'
+          active_icon_color: '#4caf50'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: perform-action
+            service: lock.lock
+            entity: lock.chevrolet_volt_doors
+      - id: m-lock-busy-locking
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-busy-m-lock-busy-locking
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '='
+          value: locking
+          enabled: true
+        icons:
+        - id: m-lock-busy-locking-ic
+          icon_mode: entity
+          entity: lock.chevrolet_volt_doors
+          active_state: locked
+          name: Locking
+          icon_inactive: mdi:lock-clock
+          icon_active: mdi:lock-clock
+          inactive_icon_color: '#ff9800'
+          active_icon_color: '#ff9800'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+      - id: m-unlock
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-locked
+          type: entity_state
+          entity: lock.chevrolet_volt_doors
+          operator: '='
+          value: locked
+          enabled: true
+        - id: cd-idle-m-unlock-0
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '!='
+          value: unlocking
+          enabled: true
+        icons:
+        - id: ic-unlock
+          icon_mode: entity
+          entity: lock.chevrolet_volt_doors
+          active_state: locked
+          name: Unlock
+          icon_inactive: mdi:lock-open
+          icon_active: mdi:lock
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: '#4caf50'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: perform-action
+            service: lock.unlock
+            entity: lock.chevrolet_volt_doors
+      - id: m-unlock-busy-unlocking
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-busy-m-unlock-busy-unlocking
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '='
+          value: unlocking
+          enabled: true
+        icons:
+        - id: m-unlock-busy-unlocking-ic
+          icon_mode: entity
+          entity: lock.chevrolet_volt_doors
+          active_state: locked
+          name: Unlocking
+          icon_inactive: mdi:lock-open-alert
+          icon_active: mdi:lock-open-alert
+          inactive_icon_color: '#ff9800'
+          active_icon_color: '#ff9800'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+    - id: c-climate
+      modules:
+      - id: m-climate
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-climate
+          icon_mode: entity
+          entity: switch.chevrolet_volt_climate
+          active_state: 'on'
+          name: Climate
+          icon_inactive: mdi:air-conditioner
+          icon_active: mdi:air-conditioner
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: '#ff9800'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: toggle
+            entity: switch.chevrolet_volt_climate
+        display_mode: every
+        display_conditions:
+        - id: cd-idle-m-climate-0
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '!='
+          value: climate on
+          enabled: true
+        - id: cd-idle-m-climate-1
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '!='
+          value: climate off
+          enabled: true
+      - id: m-climate-busy-climate-on
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: m-climate-busy-climate-on-ic
+          icon_mode: entity
+          entity: switch.chevrolet_volt_climate
+          active_state: 'on'
+          name: Starting
+          icon_inactive: mdi:fan-plus
+          icon_active: mdi:fan-plus
+          inactive_icon_color: '#ff9800'
+          active_icon_color: '#ff9800'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+        display_mode: every
+        display_conditions:
+        - id: cd-busy-m-climate-busy-climate-on
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '='
+          value: climate on
+          enabled: true
+      - id: m-climate-busy-climate-off
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: m-climate-busy-climate-off-ic
+          icon_mode: entity
+          entity: switch.chevrolet_volt_climate
+          active_state: 'on'
+          name: Stopping
+          icon_inactive: mdi:fan-minus
+          icon_active: mdi:fan-minus
+          inactive_icon_color: '#607d8b'
+          active_icon_color: '#607d8b'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+        display_mode: every
+        display_conditions:
+        - id: cd-busy-m-climate-busy-climate-off
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '='
+          value: climate off
+          enabled: true
+    - id: c-windows
+      modules:
+      - id: m-windows
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-win-idle
+          type: template
+          enabled: true
+          template: "{{ states('sensor.chevrolet_volt_engine_cmd_pending') not in ['windows up','windows\
+            \ down']\n   and states('sensor.chevrolet_volt_engine_windows') not in ['opening','closing']\
+            \ }}"
+        icons:
+        - id: ic-windows
+          icon_mode: entity
+          entity: switch.chevrolet_volt_windows
+          active_state: 'on'
+          name: Windows
+          icon_inactive: mdi:car-door
+          icon_active: mdi:car-door
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: '#ff9800'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: toggle
+            entity: switch.chevrolet_volt_windows
+      - id: m-windows-moving
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: any
+        display_conditions:
+        - id: cd-win-opening
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_windows
+          operator: '='
+          value: opening
+          enabled: true
+        - id: cd-win-closing
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_windows
+          operator: '='
+          value: closing
+          enabled: true
+        icons:
+        - id: ic-windows-moving
+          icon_mode: entity
+          entity: sensor.chevrolet_volt_engine_windows
+          name: Moving
+          icon_inactive: mdi:dots-horizontal
+          icon_active: mdi:dots-horizontal
+          inactive_icon_color: '#03a9f4'
+          active_icon_color: '#03a9f4'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+      - id: m-windows-busy-windows-down
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-m-windows-busy-windows-down
+          type: template
+          enabled: true
+          template: "{{ states('sensor.chevrolet_volt_engine_cmd_pending') == 'windows down'\n   and states('sensor.chevrolet_volt_engine_windows')\
+            \ not in ['opening','closing'] }}"
+        icons:
+        - id: m-windows-busy-windows-down-ic
+          icon_mode: entity
+          entity: switch.chevrolet_volt_windows
+          active_state: 'on'
+          name: Opening
+          icon_inactive: mdi:arrow-down-bold
+          icon_active: mdi:arrow-down-bold
+          inactive_icon_color: '#03a9f4'
+          active_icon_color: '#03a9f4'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+      - id: m-windows-busy-windows-up
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        display_mode: every
+        display_conditions:
+        - id: cd-m-windows-busy-windows-up
+          type: template
+          enabled: true
+          template: "{{ states('sensor.chevrolet_volt_engine_cmd_pending') == 'windows up'\n   and states('sensor.chevrolet_volt_engine_windows')\
+            \ not in ['opening','closing'] }}"
+        icons:
+        - id: m-windows-busy-windows-up-ic
+          icon_mode: entity
+          entity: switch.chevrolet_volt_windows
+          active_state: 'on'
+          name: Closing
+          icon_inactive: mdi:arrow-up-bold
+          icon_active: mdi:arrow-up-bold
+          inactive_icon_color: '#03a9f4'
+          active_icon_color: '#03a9f4'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+    - id: c-wake
+      modules:
+      - id: m-wake
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-wake
+          icon_mode: entity
+          entity: binary_sensor.chevrolet_volt_awake
+          active_state: 'on'
+          name: Wake
+          icon_inactive: mdi:sleep
+          icon_active: mdi:sleep-off
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: '#4caf50'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: perform-action
+            service: button.press
+            entity: button.chevrolet_volt_wake_car
+  - id: r-charge
+    column_layout: 1-2-1-2
+    columns:
+    - id: c-charging
+      modules:
+      - id: m-charging
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-charging
+          icon_mode: entity
+          entity: switch.chevrolet_volt_charging
+          active_state: 'on'
+          name: Charging
+          icon_inactive: mdi:play
+          icon_active: mdi:pause
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: '#4caf50'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: toggle
+            entity: switch.chevrolet_volt_charging
+        display_mode: every
+        display_conditions:
+        - id: cd-idle-m-charging-0
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '!='
+          value: charge starting
+          enabled: true
+        - id: cd-idle-m-charging-1
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '!='
+          value: charge stopping
+          enabled: true
+      - id: m-charging-busy-charge-starting
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: m-charging-busy-charge-starting-ic
+          icon_mode: entity
+          entity: switch.chevrolet_volt_charging
+          active_state: 'on'
+          name: Starting
+          icon_inactive: mdi:play-circle
+          icon_active: mdi:play-circle
+          inactive_icon_color: '#4caf50'
+          active_icon_color: '#4caf50'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+        display_mode: every
+        display_conditions:
+        - id: cd-busy-m-charging-busy-charge-starting
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '='
+          value: charge starting
+          enabled: true
+      - id: m-charging-busy-charge-stopping
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: m-charging-busy-charge-stopping-ic
+          icon_mode: entity
+          entity: switch.chevrolet_volt_charging
+          active_state: 'on'
+          name: Stopping
+          icon_inactive: mdi:pause-circle
+          icon_active: mdi:pause-circle
+          inactive_icon_color: '#607d8b'
+          active_icon_color: '#607d8b'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: nothing
+          inactive_icon_animation: pulse
+          active_icon_animation: pulse
+        display_mode: every
+        display_conditions:
+        - id: cd-busy-m-charging-busy-charge-stopping
+          type: entity_state
+          entity: sensor.chevrolet_volt_engine_cmd_pending
+          operator: '='
+          value: charge stopping
+          enabled: true
+    - id: c-full-once
+      modules:
+      - id: m-full-once
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-full-once
+          icon_mode: entity
+          entity: switch.chevrolet_volt_charge_to_100_once
+          active_state: 'on'
+          name: Full once
+          icon_inactive: mdi:battery-charging-100
+          icon_active: mdi:battery-lock
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: '#ff5722'
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: toggle
+            entity: switch.chevrolet_volt_charge_to_100_once
+  - id: r-alerts
+    column_layout: 1-3-1-3-1-3
+    columns:
+    - id: c-horn
+      modules:
+      - id: m-horn
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-horn
+          icon_mode: entity
+          entity: button.chevrolet_volt_horn
+          name: Horn
+          icon_inactive: mdi:bugle
+          icon_active: mdi:bugle
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: var(--secondary-text-color)
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: perform-action
+            service: button.press
+            entity: button.chevrolet_volt_horn
+          show_name_when_inactive: true
+          show_name_when_active: true
+          active_state: __never__
+    - id: c-flash
+      modules:
+      - id: m-flash
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-flash
+          icon_mode: entity
+          entity: button.chevrolet_volt_flash_lights
+          name: Lights
+          icon_inactive: mdi:car-light-high
+          icon_active: mdi:car-light-high
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: var(--secondary-text-color)
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: perform-action
+            service: button.press
+            entity: button.chevrolet_volt_flash_lights
+          show_name_when_inactive: true
+          show_name_when_active: true
+          active_state: __never__
+    - id: c-locate
+      modules:
+      - id: m-locate
+        type: icon
+        columns: 1
+        alignment: center
+        icon_size: 26
+        text_size: 12
+        icons:
+        - id: ic-locate
+          icon_mode: entity
+          entity: button.chevrolet_volt_locate_horn_lights
+          name: Locate
+          icon_inactive: mdi:map-marker-alert
+          icon_active: mdi:map-marker-alert
+          inactive_icon_color: var(--secondary-text-color)
+          active_icon_color: var(--secondary-text-color)
+          show_state_when_inactive: false
+          show_state_when_active: false
+          icon_background: circle
+          tap_action:
+            action: perform-action
+            service: button.press
+            entity: button.chevrolet_volt_locate_horn_lights
+          show_name_when_inactive: true
+          show_name_when_active: true
+          active_state: __never__

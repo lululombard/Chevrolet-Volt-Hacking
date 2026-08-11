@@ -1,0 +1,9 @@
+# Range extender override. Sits between the controls and the history so it is deliberate to
+# reach rather than something to fat-finger: forcing the engine is not an everyday action.
+# The firmware refuses "off" at or below 16% SOC, so a refused selection can snap back.
+type: entities
+title: Engine
+entities:
+- entity: select.chevrolet_volt_engine_mode
+  name: Range extender
+  icon: mdi:engine
