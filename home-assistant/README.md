@@ -46,13 +46,21 @@ metrics list > metrics-all.txt
 # hold: about half are empty on any given dump, and an empty value reads as text, which
 # turns booleans into text sensors and leaves numbers without a state class so Home
 # Assistant never records statistics for them.
-python3 tools/gen_discovery.py metrics-all.txt /path/to/OVMS.V3/main > discovery.tsv
+python3 tools/gen_discovery.py metrics-all.txt /path/to/OVMS.V3/main --pin=1234 > discovery.tsv
 
 # publish, retained so HA rebuilds them on restart
 while IFS=$'\t' read -r topic payload; do
   mosquitto_pub -h <broker> -p 1883 -u ovms -P "$PW" -t "$topic" -m "$payload" -r -q 1
 done < discovery.tsv
 ```
+
+The PIN goes into the payloads of the commands the module refuses without it: lock, unlock, the windows switch, the trunk button, and the on and off options of the engine select.
+Releasing the engine override does not need it, so `auto` is sent without.
+Pass `--pin=` or set `OVMS_PIN`.
+It is not read from a file and there is no default, because this repo is public.
+Without it the script refuses to run rather than publishing buttons the car would reject.
+
+:warning: The PIN ends up in the retained discovery payloads on your broker, so anyone who can read those can unlock the car!
 
 :warning: Publishing an empty retained payload to a config topic deletes that entity!
 

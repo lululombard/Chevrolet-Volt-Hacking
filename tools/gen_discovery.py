@@ -97,8 +97,10 @@ CURATED_BINARY = {
 # A lock entity rather than a pair of buttons: it carries state, so Home Assistant renders one
 # control showing locked/unlocked and offering the opposite action. Two buttons cannot do that,
 # they are stateless and always show both.
+# {PIN} is substituted at generation time. The module refuses these outright without the
+# vehicle PIN, so the payload has to carry it.
 LOCKS = [
-    ("lock", "Doors", "v.e.locked", "lock 0000", "unlock 0000", "mdi:car-door-lock"),
+    ("lock", "Doors", "v.e.locked", "lock {PIN}", "unlock {PIN}", "mdi:car-door-lock"),
 ]
 
 # Switches for the on/off pairs, same reasoning as the lock: they carry state, so Home Assistant
@@ -115,7 +117,7 @@ SWITCHES = [
     # the position they are heading for. The toggle then flips the moment the glass starts
     # moving rather than after it settles. An unmatched payload leaves the state untouched.
     ("windows", "Windows", "xva.v.e.windows",
-     "xva windows down", "xva windows up", "mdi:car-door", {
+     "xva windows down {PIN}", "xva windows up {PIN}", "mdi:car-door", {
         "state_on": "open",
         "state_off": "closed",
         "value_template": "{{ 'open' if value in ['open', 'opening'] else 'closed' }}",
@@ -125,7 +127,7 @@ SWITCHES = [
 BUTTONS = [
     # Disabled on arrival. Releasing the hatch remotely cannot be undone remotely: the car will
     # sit there unlatched until somebody physically shuts it. Enable it by hand if you want it.
-    ("trunk",          "Trunk",               "xva trunk",                "mdi:car-back",
+    ("trunk",          "Trunk",               "xva trunk {PIN}",          "mdi:car-back",
      {"enabled_by_default": False}),
     ("wakeup",         "Wake car",            "wakeup",                   "mdi:bell-ring"),
     # OnStar telematics alerts. These need xva/control.enabled, and the car's body has to be
@@ -138,6 +140,8 @@ BUTTONS = [
 # Selects. The engine override is three mutually exclusive modes rather than an on/off pair,
 # so it is a select: a switch cannot hold "auto", and three buttons cannot show which one is
 # active. The state metric reports forced-on/forced-off/auto, mapped to the option names.
+# "auto" only releases an override, so the module does not ask for the PIN on it. The other 2
+# get it appended, which is why the options carry their own command rather than sharing a stem.
 SELECTS = [
     ("engine_mode", "Engine mode", "xva.v.e.mode", "xva engine",
      ["auto", "on", "off"],
@@ -370,6 +374,16 @@ def main():
     # given dump (event driven, or only populated while the car is awake). An empty value looks
     # like text, which silently turns booleans into text sensors and numbers into untyped ones
     # that Home Assistant will not record statistics for.
+    # The PIN is an argument, never a default and never committed: this repo is public.
+    pin = os.environ.get("OVMS_PIN", "")
+    argv = []
+    for a in sys.argv[1:]:
+        if a.startswith("--pin="):
+            pin = a.split("=", 1)[1]
+        else:
+            argv.append(a)
+    sys.argv = [sys.argv[0]] + argv
+
     types = {}
     src = os.environ.get("OVMS_SRC")
     if len(sys.argv) > 2:
@@ -516,9 +530,11 @@ def main():
             "value_template": tmpl,
             "options": options,
             # HA sends the chosen option as the payload; OVMS needs "xva engine <option>", so
-            # the command template prepends the verb.
+            # the command template prepends the verb. "auto" only releases an override and the
+            # module does not ask for the PIN on it, so the template appends it conditionally
+            # rather than always.
             "command_topic": f"{PREFIX}client/{CMD_CLIENT}/command/{key}",
-            "command_template": cmd + " {{ value }}",
+            "command_template": cmd + " {{ value }}{{ ' {PIN}' if value != 'auto' else '' }}",
             "device": DEVICE, "availability": AVAIL, "icon": icon,
         }
         t = f"homeassistant/select/{NODE}/{ENTITY_PREFIX}_{key}/config"
@@ -577,9 +593,19 @@ def main():
         t = f"homeassistant/button/{NODE}/btn_{key}/config"
         out.append(f"{t}\t{json.dumps(cfg, ensure_ascii=False)}")
 
+    body = "\n".join(out)
+    if "{PIN}" in body:
+        if not pin:
+            sys.stderr.write(
+                "error: some commands need the vehicle PIN and none was given.\n"
+                "       pass --pin=1234 or set OVMS_PIN. Without it Home Assistant would\n"
+                "       publish buttons the car refuses.\n")
+            sys.exit(1)
+        body = body.replace("{PIN}", pin)
+
     sys.stderr.write(f"onstar={n_onstar} curated={n_cur} diagnostic={n_diag} "
                  f"buttons={len(BUTTONS)} excluded={n_skip} total={len(out)}\n")
-    print("\n".join(out))
+    print(body)
 
 
 if __name__ == "__main__":
